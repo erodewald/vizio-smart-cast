@@ -569,7 +569,7 @@ let SMARTCAST = function smartcast(host, authKey) {
    };
 };
 
-SMARTCAST.discover = (success, error, timeout) => {
+SMARTCAST.discover = (error, timeout) => new Promise((resolve, reject) => { 
     if (!error) {
         error = () => {};
     }
@@ -612,7 +612,7 @@ SMARTCAST.discover = (success, error, timeout) => {
 
                     parser.onend = function () {
                         if (device.manufacturer.toUpperCase() === 'VIZIO') {
-                            success(device);
+                            resolve(device);
                         } else {
                             error('Incorrect manufacturer found: ' + device.manufacturer, device);
                         }
@@ -620,10 +620,10 @@ SMARTCAST.discover = (success, error, timeout) => {
 
                     parser.write(description).close();
                 } catch (err) {
-                    error(err);
+                    reject(err);
                 }
             }).catch((err) => {
-                error(err);
+                reject(err);
             });
 
         });
@@ -631,6 +631,6 @@ SMARTCAST.discover = (success, error, timeout) => {
 
         setTimeout(() => {}, timeout);
 
-};
+});
 
 module.exports = SMARTCAST;
