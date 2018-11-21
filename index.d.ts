@@ -84,6 +84,7 @@ interface SmartcastSettings {
 
 interface SmartcastSettingsPicture {
     get(): Promise<any>;
+    backlight: SmartcastGetSet;
     size: SmartcastGet;
     position: SmartcastGet;
     modeEdit: SmartcastGet;

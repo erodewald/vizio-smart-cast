@@ -332,6 +332,45 @@ let SMARTCAST = function smartcast(host, authKey) {
                     return sendRequest('get', host + '/menu_native/dynamic/tv_settings/picture/picture_position', _authKey);
                 }
             },
+            backlight: {
+                get: (expanded) => {
+                    let promise = sendRequest('get', host + '/menu_native/dynamic/tv_settings/picture/backlight', _authKey);
+                    if (!expanded) {
+                        return new Promise((resolve, reject) => {
+                            promise
+                            .then(response => {
+                                resolve(response.ITEMS.find(i=>i.CNAME==='backlight').VALUE);
+                            })
+                            .catch(reject)
+                        });
+                    }
+
+                    return promise;
+                },
+                set: (value) => {
+                    return new Promise((resolve, reject) => {
+                        if (typeof value !== 'number') {
+                            reject('value must be a number');
+                            return;
+                        }
+
+                        this.settings.picture.backlight.get(true).then((settings) => {
+                            let backlight = settings.ITEMS.find(i => i.CNAME === 'backlight');
+                            if (!backlight) {
+                                reject('could not get backlight settings');
+                                return;
+                            }
+                            
+                            let data = {
+                                REQUEST: 'MODIFY',
+                                HASHVAL: backlight.HASHVAL,
+                                VALUE: value
+                            };
+                            sendRequest('put', host + '/menu_native/dynamic/tv_settings/picture/backlight', _authKey, data).then(resolve).catch(reject);
+                        }).catch(reject);
+                    });
+                }
+            },
             mode: {
                 get: () => {
                     return sendRequest('get', host + '/menu_native/dynamic/tv_settings/picture/picture_mode', _authKey);
